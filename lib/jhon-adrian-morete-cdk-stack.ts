@@ -35,6 +35,7 @@ export class JhonAdrianMoreteCdkStack extends cdk.Stack {
     //CDK Lambda Resource
     const lambdaFn = new lambda.NodejsFunction(this, 'MyLambda', {
       entry: 'lambda/handler.ts',
+      handler: 'handler',
       environment: {
         DYNAMODB_TABLE: table.tableName,
         AES_SECRET_KEY: process.env.AES_SECRET_KEY!,
@@ -42,6 +43,7 @@ export class JhonAdrianMoreteCdkStack extends cdk.Stack {
     });
     table.grantReadWriteData(lambdaFn);
 
+    /*
     //CDK Authorizer Resource
     const authorizerFn = new lambda.NodejsFunction(this, 'AuthorizerFn', {
       entry: 'lambda/authorizer.ts',
@@ -49,7 +51,7 @@ export class JhonAdrianMoreteCdkStack extends cdk.Stack {
 
     const authorizer = new apigateway.TokenAuthorizer(this, 'LambdaAuthorizer', {
       handler: authorizerFn,
-    });
+    });*/
 
     // API Gateway (CDK) with CORS
     const api = new apigateway.RestApi(this, 'MyApi', {
@@ -59,10 +61,9 @@ export class JhonAdrianMoreteCdkStack extends cdk.Stack {
       },
     });
 
+    api.root.addMethod('GET', new apigateway.LambdaIntegration(lambdaFn));
+
     const resource = api.root.addResource('items');
-    resource.addMethod('POST', new apigateway.LambdaIntegration(lambdaFn), {
-      authorizer,
-      authorizationType: apigateway.AuthorizationType.CUSTOM,
-    });
+    resource.addMethod('POST', new apigateway.LambdaIntegration(lambdaFn));
   }
 }

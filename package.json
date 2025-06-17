@@ -25,6 +25,7 @@
     "aws-cdk-lib": "^2.x.x",
     "aws-sdk": "^2.1692.0",
     "constructs": "^10.0.0",
-    "dotenv": "^16.5.0"
+    "dotenv": "^16.5.0",
+    "uuid": "^11.1.0"
   }
 }
