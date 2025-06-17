@@ -43,7 +43,6 @@ export class JhonAdrianMoreteCdkStack extends cdk.Stack {
     });
     table.grantReadWriteData(lambdaFn);
 
-    /*
     //CDK Authorizer Resource
     const authorizerFn = new lambda.NodejsFunction(this, 'AuthorizerFn', {
       entry: 'lambda/authorizer.ts',
@@ -51,7 +50,7 @@ export class JhonAdrianMoreteCdkStack extends cdk.Stack {
 
     const authorizer = new apigateway.TokenAuthorizer(this, 'LambdaAuthorizer', {
       handler: authorizerFn,
-    });*/
+    });
 
     // API Gateway (CDK) with CORS
     const api = new apigateway.RestApi(this, 'MyApi', {
@@ -61,9 +60,25 @@ export class JhonAdrianMoreteCdkStack extends cdk.Stack {
       },
     });
 
-    api.root.addMethod('GET', new apigateway.LambdaIntegration(lambdaFn));
-
     const resource = api.root.addResource('items');
-    resource.addMethod('POST', new apigateway.LambdaIntegration(lambdaFn));
+    resource.addMethod('GET', new apigateway.LambdaIntegration(lambdaFn), {
+      authorizer,
+      authorizationType: apigateway.AuthorizationType.CUSTOM,
+    });
+
+    resource.addMethod('POST', new apigateway.LambdaIntegration(lambdaFn), {
+      authorizer,
+      authorizationType: apigateway.AuthorizationType.CUSTOM,
+    });
+
+    resource.addMethod('PUT', new apigateway.LambdaIntegration(lambdaFn), {
+      authorizer,
+      authorizationType: apigateway.AuthorizationType.CUSTOM,
+    });
+
+    resource.addMethod('DELETE', new apigateway.LambdaIntegration(lambdaFn), {
+      authorizer,
+      authorizationType: apigateway.AuthorizationType.CUSTOM,
+    });
   }
 }
