@@ -33,14 +33,18 @@ export const postRequest = async (event: any) => {
 
     return {
         statusCode: 200,
+        headers: {
+            'Access-Control-Allow-Origin': 'http://localhost:3000',
+            'Access-Control-Allow-Credentials': true,
+        },
         body: JSON.stringify(
           {
             message: 'Data saved to DynamoDB (v2)',
             id,
-            date: encryptedDate, 
-            category: encryptedCategory,
-            description: encryptedDescription, 
-            submitted_by: encryptedSubmitted_by,
+            date: date, 
+            category: category,
+            description: description, 
+            submitted_by: submitted_by,
           },
           null,
           2 // <-- pretty print with 2-space indentation
@@ -64,6 +68,10 @@ export const getRequest = async (event: any) => {
             const item = result.Item;
             return {
                 statusCode: 200,
+                headers: {
+                    'Access-Control-Allow-Origin': 'http://localhost:3000',
+                    'Access-Control-Allow-Credentials': true,
+                },
                 body: JSON.stringify(
                 {
                     id: item.id,
@@ -79,6 +87,10 @@ export const getRequest = async (event: any) => {
         } else {
             return {
                 statusCode: 404,
+                headers: {
+                    'Access-Control-Allow-Origin': 'http://localhost:3000',
+                    'Access-Control-Allow-Credentials': true,
+                },
                 body: JSON.stringify({ message: "Item not found" }, null, 2),
             };
         }
@@ -93,6 +105,10 @@ export const getRequest = async (event: any) => {
         //return in order
         return {
             statusCode: 200,
+            headers: {
+                'Access-Control-Allow-Origin': 'http://localhost:3000',
+                'Access-Control-Allow-Credentials': true,
+            },
             body: JSON.stringify({
                 items: (data.Items || []).map(item => ({
                     id: item.id,
@@ -121,6 +137,10 @@ export const putRequest = async (event: any) => {
     if (!id) {
         return {
         statusCode: 400,
+        headers: {
+            'Access-Control-Allow-Origin': 'http://localhost:3000',
+            'Access-Control-Allow-Credentials': true,
+        },
         body: JSON.stringify({ message: 'Missing ID for update' }),
         };
     }
@@ -145,6 +165,10 @@ export const putRequest = async (event: any) => {
 
     return {
         statusCode: 200,
+        headers: {
+            'Access-Control-Allow-Origin': 'http://localhost:3000',
+            'Access-Control-Allow-Credentials': true,
+        },
         body: JSON.stringify(
           {
             message: 'Item updated',
@@ -166,8 +190,12 @@ export const deleteRequest = async (event: any) => {
 
     if (!id) {
         return {
-          statusCode: 400,
-          body: JSON.stringify({ message: 'Missing ID for deletion' }),
+            headers: {
+                'Access-Control-Allow-Origin': 'http://localhost:3000',
+                'Access-Control-Allow-Credentials': true,
+            },
+            statusCode: 400,
+            body: JSON.stringify({ message: 'Missing ID for deletion' }),
         };
     }
 
@@ -180,6 +208,10 @@ export const deleteRequest = async (event: any) => {
 
     return {
         statusCode: 200,
+        headers: {
+            'Access-Control-Allow-Origin': 'http://localhost:3000',
+            'Access-Control-Allow-Credentials': true,
+        },
         body: JSON.stringify({ message: `Item with id ${id} deleted` }, null, 2),
     };
 }

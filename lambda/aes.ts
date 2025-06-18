@@ -2,8 +2,8 @@ import * as crypto from 'crypto';
 import * as dotenv from 'dotenv';
 dotenv.config();
 
-//const aesKey = Buffer.from(process.env.AES_SECRET_KEY!, 'base64');
-const aesKey = Buffer.from('Sgm6F6zpF2h8hgp68ii3zzyVVruVCxDsjhQjDugkS40=', 'base64');//process.env.AES_SECRET_KEY!;
+const aesKey = Buffer.from(process.env.AES_SECRET_KEY!, 'base64');
+//const aesKey = Buffer.from('Sgm6F6zpF2h8hgp68ii3zzyVVruVCxDsjhQjDugkS40=', 'base64');//process.env.AES_SECRET_KEY!;
 
 export function encrypt(text: string): string {
   const iv = crypto.randomBytes(16);

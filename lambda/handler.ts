@@ -14,12 +14,20 @@ export const handler = async (event: any) => {
 
     return {
       statusCode: 405,
+      headers: {
+          'Access-Control-Allow-Origin': 'http://localhost:3000',
+          'Access-Control-Allow-Credentials': true,
+      },
       body: JSON.stringify({ error: 'Method Not Allowed' }),
     };
   } catch (err) {
     console.error('Error:', err);
     return {
       statusCode: 500,
+      headers: {
+          'Access-Control-Allow-Origin': 'http://localhost:3000',
+          'Access-Control-Allow-Credentials': true,
+      },
       body: JSON.stringify({ error: 'Internal Server Error' }),
     };
   }

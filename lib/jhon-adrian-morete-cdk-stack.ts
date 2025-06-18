@@ -9,13 +9,6 @@ export class JhonAdrianMoreteCdkStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    // The code that defines your stack goes here
-
-    // example resource
-    // const queue = new sqs.Queue(this, 'JhonAdrianMoreteCdkQueue', {
-    //   visibilityTimeout: cdk.Duration.seconds(300)
-    // });
-
     //DynamoDB Table (CDK)
     const table = new dynamodb.Table(this, 'MyTable', {
       partitionKey: { name: 'id', type: dynamodb.AttributeType.STRING },
@@ -55,16 +48,18 @@ export class JhonAdrianMoreteCdkStack extends cdk.Stack {
     // API Gateway (CDK) with CORS
     const api = new apigateway.RestApi(this, 'MyApi', {
       defaultCorsPreflightOptions: {
-        allowOrigins: apigateway.Cors.ALL_ORIGINS,
-        allowMethods: apigateway.Cors.ALL_METHODS,
+        allowOrigins: ['http://localhost:3000'], // restrict here
+        allowMethods: apigateway.Cors.ALL_METHODS, // or specify methods
       },
     });
 
-    const resource = api.root.addResource('items');
+
+    const resource = api.root.addResource('expenses');
     resource.addMethod('GET', new apigateway.LambdaIntegration(lambdaFn), {
       authorizer,
       authorizationType: apigateway.AuthorizationType.CUSTOM,
     });
+
 
     resource.addMethod('POST', new apigateway.LambdaIntegration(lambdaFn), {
       authorizer,
