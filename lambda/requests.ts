@@ -22,10 +22,10 @@ export const postRequest = async (event: any) => {
         TableName: table,
         Item: {
           id,
-          encryptedDate, 
-          encryptedCategory,
-          encryptedDescription, 
-          encryptedSubmitted_by,
+          date: encryptedDate, 
+          category: encryptedCategory,
+          description: encryptedDescription, 
+          submitted_by: encryptedSubmitted_by,
         },
     };
 
@@ -37,10 +37,10 @@ export const postRequest = async (event: any) => {
           {
             message: 'Data saved to DynamoDB (v2)',
             id,
-            encryptedDate, 
-            encryptedCategory,
-            encryptedDescription, 
-            encryptedSubmitted_by,
+            date: encryptedDate, 
+            category: encryptedCategory,
+            description: encryptedDescription, 
+            submitted_by: encryptedSubmitted_by,
           },
           null,
           2 // <-- pretty print with 2-space indentation
@@ -67,10 +67,10 @@ export const getRequest = async (event: any) => {
                 body: JSON.stringify(
                 {
                     id: item.id,
-                    date: item.date,
-                    category: item.category,
-                    description: item.description,
-                    submitted_by: item.submitted_by,
+                    date: decrypt(item.date),
+                    category: decrypt(item.category),
+                    description: decrypt(item.description),
+                    submitted_by: decrypt(item.submitted_by),
                 },
                 null,
                 2
@@ -96,10 +96,10 @@ export const getRequest = async (event: any) => {
             body: JSON.stringify({
                 items: (data.Items || []).map(item => ({
                     id: item.id,
-                    date: item.date,
-                    category: item.category,
-                    description: item.description,
-                    submitted_by: item.submitted_by,
+                    date: decrypt(item.date),
+                    category: decrypt(item.category),
+                    description: decrypt(item.description),
+                    submitted_by: decrypt(item.submitted_by),
                 })),},
             null,
             2 // pretty-print
@@ -112,6 +112,11 @@ export const putRequest = async (event: any) => {
     const id = event.queryStringParameters?.id;
     const body = JSON.parse(event.body || '{}');
     const { date, category, description, submitted_by } = body;
+
+    const encryptedDate = encrypt(date);
+    const encryptedCategory = encrypt(category);
+    const encryptedDescription = encrypt(description);
+    const encryptedSubmitted_by = encrypt(submitted_by);
 
     if (!id) {
         return {
@@ -128,10 +133,10 @@ export const putRequest = async (event: any) => {
             '#d': 'date', // 'date' is a reserved word in DynamoDB
         },
         ExpressionAttributeValues: {
-            ':date': date,
-            ':cat': category,
-            ':desc': description,
-            ':sub': submitted_by,
+            ':date': encryptedDate,
+            ':cat': encryptedCategory,
+            ':desc': encryptedDescription,
+            ':sub': encryptedSubmitted_by,
         },
         ReturnValues: 'ALL_NEW',
     };
