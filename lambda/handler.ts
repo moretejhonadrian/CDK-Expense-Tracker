@@ -1,15 +1,20 @@
-import { postRequest, getRequest, putRequest, deleteRequest } from './requests';
+import { postRequest, getRequest, putRequest, deleteRequest, getMonthlyTotal } from './requests';
 
 export const handler = async (event: any) => {
   try {
-    if (event.httpMethod === 'POST') {
-      return await postRequest(event);
-    } else if (event.httpMethod === 'GET') {
-      return await getRequest(event);
-    } else if (event.httpMethod === 'PUT') {
-      return await putRequest(event);
-    } else if (event.httpMethod === 'DELETE') {
-      return await deleteRequest(event);
+    const path = event.path;
+    const method = event.httpMethod;
+
+    //route specifically for expenses/monthly-total
+    if (path === '/expenses/monthly-total' && method === 'GET') {
+      return await getMonthlyTotal(event);
+    }
+
+    if (path.includes('/expenses')) {
+      if (method === 'POST') return await postRequest(event);
+      if (method === 'GET') return await getRequest(event);
+      if (method === 'PUT') return await putRequest(event);
+      if (method === 'DELETE') return await deleteRequest(event);
     }
 
     return {

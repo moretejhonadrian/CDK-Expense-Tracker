@@ -73,13 +73,11 @@ export class JhonAdrianMoreteCdkStack extends cdk.Stack {
       },
     });
 
-
     const resource = api.root.addResource('expenses');
     resource.addMethod('GET', new apigateway.LambdaIntegration(lambdaFn), {
       authorizer: cognitoAuthorizer,
       authorizationType: apigateway.AuthorizationType.COGNITO,
     });
-
 
     resource.addMethod('POST', new apigateway.LambdaIntegration(lambdaFn), {
       authorizer: cognitoAuthorizer,
@@ -92,6 +90,12 @@ export class JhonAdrianMoreteCdkStack extends cdk.Stack {
     });
 
     resource.addMethod('DELETE', new apigateway.LambdaIntegration(lambdaFn), {
+      authorizer: cognitoAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
+    });
+
+    const monthlyTotal = resource.addResource('monthly-total');
+    monthlyTotal.addMethod('GET', new apigateway.LambdaIntegration(lambdaFn), {
       authorizer: cognitoAuthorizer,
       authorizationType: apigateway.AuthorizationType.COGNITO,
     });
