@@ -18,11 +18,35 @@ export class JhonAdrianMoreteCdkStack extends cdk.Stack {
 
     //Cognito User Pool (CDK)
     const userPool = new cognito.UserPool(this, 'UserPool', {
+      userPoolName: 'expense-tracker-UserPool',
       selfSignUpEnabled: true,
-      signInAliases: { email: true },
+      signInAliases: {
+        email: true,
+      },
+      autoVerify: {
+        email: true,
+      },
     });
+
+    const userPoolDomain = userPool.addDomain('UserPoolDomain', {
+      cognitoDomain: {
+        domainPrefix: 'expensetracker-userpool-domain',
+      },
+    })
+    
     const userPoolClient = new cognito.UserPoolClient(this, 'UserPoolClient', {
       userPool,
+      authFlows: {
+        userPassword: true,
+      },
+      oAuth: {
+        flows: {
+          implicitCodeGrant: true,
+        },
+        scopes: [cognito.OAuthScope.EMAIL, cognito.OAuthScope.OPENID],
+        callbackUrls: ['https://localhost:3000'],
+        logoutUrls: ['https://localhost:3000'],
+      }
     });
 
     //CDK Lambda Resource
@@ -37,12 +61,8 @@ export class JhonAdrianMoreteCdkStack extends cdk.Stack {
     table.grantReadWriteData(lambdaFn);
 
     //CDK Authorizer Resource
-    const authorizerFn = new lambda.NodejsFunction(this, 'AuthorizerFn', {
-      entry: 'lambda/authorizer.ts',
-    });
-
-    const authorizer = new apigateway.TokenAuthorizer(this, 'LambdaAuthorizer', {
-      handler: authorizerFn,
+    const cognitoAuthorizer = new apigateway.CognitoUserPoolsAuthorizer(this, 'CognitoAuthorizer', {
+      cognitoUserPools: [userPool],
     });
 
     // API Gateway (CDK) with CORS
@@ -56,24 +76,24 @@ export class JhonAdrianMoreteCdkStack extends cdk.Stack {
 
     const resource = api.root.addResource('expenses');
     resource.addMethod('GET', new apigateway.LambdaIntegration(lambdaFn), {
-      authorizer,
-      authorizationType: apigateway.AuthorizationType.CUSTOM,
+      authorizer: cognitoAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
     });
 
 
     resource.addMethod('POST', new apigateway.LambdaIntegration(lambdaFn), {
-      authorizer,
-      authorizationType: apigateway.AuthorizationType.CUSTOM,
+      authorizer: cognitoAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
     });
 
     resource.addMethod('PUT', new apigateway.LambdaIntegration(lambdaFn), {
-      authorizer,
-      authorizationType: apigateway.AuthorizationType.CUSTOM,
+      authorizer: cognitoAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
     });
 
     resource.addMethod('DELETE', new apigateway.LambdaIntegration(lambdaFn), {
-      authorizer,
-      authorizationType: apigateway.AuthorizationType.CUSTOM,
+      authorizer: cognitoAuthorizer,
+      authorizationType: apigateway.AuthorizationType.COGNITO,
     });
   }
 }
